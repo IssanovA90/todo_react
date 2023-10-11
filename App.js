@@ -1,20 +1,69 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { Layout, InputV1, ButtonV1 } from "./function";
+
+
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+ const [taskName, settaskName] = useState('');
+    const [tasks, settasks] = useState([]);
+
+    const addTask = () => {
+        if (taskName) {
+            const newTask = {
+                id: Date.now(),
+                value: taskName,
+            };
+            settasks([...tasks, newTask]);
+            settaskName('');
+        }
+    };
+
+    const deleteTask = (taskId) => {
+        const updatedTasks = tasks.filter((task) => task.id !== taskId);
+        settasks(updatedTasks);
+    };
+
+    return (
+        <Layout>
+            <Text style={styles.title}>Список задач</Text>
+            <InputV1
+                placeholder={"Введите название задачи"}
+                value={taskName}
+                onChangeText={(text) => settaskName(text)}
+            />
+            <ButtonV1
+                title={"Добавить"}
+                onPress={addTask}
+            />
+
+            <FlatList
+                data={tasks}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <TouchableOpacity
+                        onLongPress={() => deleteTask(item.id)}
+                        style={styles.tolist}
+                    >
+                        <Text>{item.value}</Text>
+                    </TouchableOpacity>
+                )}
+            />
+        </Layout>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 16,
+    },
+    tolist: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 8,
+        marginBottom: 8,
+    },
 });
